@@ -1,5 +1,5 @@
 
-import { X, Minus, Plus, ShoppingBag } from "lucide-react";
+import { X, Minus, Plus, ShoppingBag, Receipt } from "lucide-react";
 import { CartItem } from "../pages/Index";
 
 interface CartProps {
@@ -102,16 +102,46 @@ const Cart = ({ isOpen, onClose, cartItems, onRemoveItem, onUpdateQuantity, tota
             )}
           </div>
           
-          {/* Footer */}
+          {/* Bill Summary - Enhanced */}
           {cartItems.length > 0 && (
-            <div className="border-t border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-lg font-semibold text-gray-800">Total:</span>
-                <span className="text-2xl font-bold text-amber-600">₹{totalPrice}</span>
+            <div className="border-t border-gray-200 bg-gradient-to-r from-amber-50 to-orange-50">
+              {/* Bill Header */}
+              <div className="px-6 py-4 border-b border-amber-200">
+                <div className="flex items-center justify-center">
+                  <Receipt className="w-5 h-5 text-amber-600 mr-2" />
+                  <h3 className="text-lg font-bold text-amber-800">Bill Summary</h3>
+                </div>
               </div>
-              <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                Proceed to Checkout
-              </button>
+              
+              {/* Bill Details */}
+              <div className="px-6 py-4 space-y-3">
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Items ({cartItems.reduce((total, item) => total + item.quantity, 0)})</span>
+                  <span>₹{totalPrice}</span>
+                </div>
+                
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Delivery</span>
+                  <span className="text-green-600">Free</span>
+                </div>
+                
+                <div className="border-t border-amber-200 pt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xl font-bold text-gray-800">Total Amount</span>
+                    <span className="text-2xl font-bold text-amber-600">₹{totalPrice}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Payment Button */}
+              <div className="px-6 pb-6">
+                <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg">
+                  Pay ₹{totalPrice}
+                </button>
+                <p className="text-center text-xs text-gray-500 mt-2">
+                  Secure payment • Free delivery • 100% guarantee
+                </p>
+              </div>
             </div>
           )}
         </div>
