@@ -4,7 +4,8 @@ import Header from "../components/Header";
 import ProductCard from "../components/ProductCard";
 import Cart from "../components/Cart";
 import QRCodeSection from "../components/QRCodeSection";
-import { ShoppingCart, Leaf } from "lucide-react";
+import AdminDashboard from "./AdminDashboard";
+import { ShoppingCart, Leaf, Settings } from "lucide-react";
 
 export interface Product {
   id: number;
@@ -19,7 +20,7 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
-const products: Product[] = [
+const initialProducts: Product[] = [
   {
     id: 1,
     name: "Premium Almonds",
@@ -71,9 +72,31 @@ const products: Product[] = [
 ];
 
 const Index = () => {
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showQR, setShowQR] = useState(true);
+  const [isAdminMode, setIsAdminMode] = useState(false);
+  const [nextProductId, setNextProductId] = useState(7);
+
+  const addProduct = (newProduct: Omit<Product, 'id'>) => {
+    const product: Product = {
+      ...newProduct,
+      id: nextProductId
+    };
+    setProducts(prev => [...prev, product]);
+    setNextProductId(prev => prev + 1);
+  };
+
+  const editProduct = (updatedProduct: Product) => {
+    setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+  };
+
+  const deleteProduct = (productId: number) => {
+    setProducts(prev => prev.filter(p => p.id !== productId));
+    // Also remove from cart if exists
+    setCartItems(prev => prev.filter(item => item.id !== productId));
+  };
 
   const addToCart = (product: Product) => {
     setCartItems(prev => {
@@ -113,15 +136,39 @@ const Index = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
+  // Admin Dashboard
+  if (isAdminMode) {
+    return (
+      <AdminDashboard
+        products={products}
+        onAddProduct={addProduct}
+        onEditProduct={editProduct}
+        onDeleteProduct={deleteProduct}
+        onSwitchToCustomer={() => setIsAdminMode(false)}
+      />
+    );
+  }
+
+  // QR Code Screen
   if (showQR) {
     return (
       <QRCodeSection onEnterStore={() => setShowQR(false)} />
     );
   }
 
+  // Customer Interface
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
       <Header onCartClick={() => setIsCartOpen(true)} cartItemsCount={getTotalItems()} />
+      
+      {/* Admin Access Button */}
+      <button
+        onClick={() => setIsAdminMode(true)}
+        className="fixed top-24 right-4 bg-gray-800 text-white p-3 rounded-full hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 shadow-lg z-40"
+        title="Admin Access"
+      >
+        <Settings className="w-5 h-5" />
+      </button>
       
       {/* Hero Section */}
       <section className="pt-24 pb-12 px-4">
